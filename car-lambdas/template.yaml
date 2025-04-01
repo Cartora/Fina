@@ -1,0 +1,49 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  car-lambdas
+
+Globals:
+  Function:
+    Timeout: 20
+    MemorySize: 512
+    Runtime: java17
+    Architectures: [x86_64]
+
+Resources:
+
+  CarDataTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: CarData
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: licensePlate
+          AttributeType: S
+        - AttributeName: timestamp
+          AttributeType: S
+      KeySchema:
+        - AttributeName: licensePlate
+          KeyType: HASH
+        - AttributeName: timestamp
+          KeyType: RANGE
+      StreamSpecification:
+        StreamViewType: NEW_IMAGE
+
+  StoreCarDataFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: StoreCarDataFunction/
+      Handler: store.Handler::handleRequest
+      Environment:
+        Variables:
+          TABLE_NAME: CarData
+      Events:
+        StoreCarEndpoint:
+          Type: Api
+          Properties:
+            Path: /store
+            Method: post
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: CarData
