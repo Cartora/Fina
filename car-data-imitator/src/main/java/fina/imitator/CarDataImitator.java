@@ -1,7 +1,9 @@
 package fina.imitator;
 
 import java.io.IOException;
-import java.net.*;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Random;
@@ -15,7 +17,7 @@ public class CarDataImitator {
     };
 
     private static final int UDP_PORT = 41234; // target port for UDP receiver
-    private static final String UDP_HOST = "localhost"; // replace with your ECS or local address
+    private static final String UDP_HOST = "receiver.imitator-cluster"; // replace with your ECS or local address
     private static final int INTERVAL_MS = 30000; // send every 30 seconds
 
 
