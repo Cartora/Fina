@@ -20,12 +20,12 @@ Resources:
       AttributeDefinitions:
         - AttributeName: licensePlate
           AttributeType: S
-        - AttributeName: timestamp
+        - AttributeName: entryTime
           AttributeType: S
       KeySchema:
         - AttributeName: licensePlate
           KeyType: HASH
-        - AttributeName: timestamp
+        - AttributeName: entryTime
           KeyType: RANGE
       StreamSpecification:
         StreamViewType: NEW_IMAGE
