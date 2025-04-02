@@ -34,16 +34,15 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: StoreCarDataFunction/
-      Handler: store.Handler::handleRequest
+      Handler: store.StoreCarData::handleRequest
       Environment:
         Variables:
           TABLE_NAME: CarData
       Events:
-        StoreCarEndpoint:
-          Type: Api
+        ScheduledTrigger:
+          Type: Schedule
           Properties:
-            Path: /store
-            Method: post
+            Schedule: rate(1 minute)
       Policies:
         - DynamoDBCrudPolicy:
             TableName: CarData
