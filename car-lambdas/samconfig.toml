@@ -11,10 +11,12 @@ parallel = true
 lint = true
 
 [default.deploy.parameters]
+s3_bucket = "car-lambdas-artifacts-bucket"
 capabilities = "CAPABILITY_IAM"
 confirm_changeset = true
-resolve_s3 = true
 region = "us-east-1"   
+s3_prefix = "car-lambdas"
+image_repositories = []
 
 [default.package.parameters]
 resolve_s3 = true

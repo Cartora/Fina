@@ -45,13 +45,18 @@ public class PaymentCheckerLambda implements RequestHandler<DynamodbEvent, Void>
             Instant timestamp = Instant.parse(timestampStr);
             Instant now = Instant.now();
 
+            context.getLogger()
+                    .log("Car " + carPlate + " timestampStr: " + timestampStr + " slotId: " + slotId + " now: " + now);
+
             try {
                 if (s3Client.doesObjectExist(BUCKET_NAME, carPlate)) {
                     // Read current nextValidationTime from S3
+                    context.getLogger().log("Found " + carPlate + " in S3 bucket. Checking validation time.");
                     BufferedReader reader = new BufferedReader(new InputStreamReader(
                             s3Client.getObject(BUCKET_NAME, carPlate).getObjectContent()));
                     Instant nextValidationTime = Instant.parse(reader.readLine());
-
+                    context.getLogger().log("Next validation time for " + carPlate + ": " + nextValidationTime);
+                    
                     if (nextValidationTime.isBefore(now)) {
                         boolean isPaid = random.nextInt(100) < 85;
                         context.getLogger().log("Car " + carPlate + " validated: " + (isPaid ? "Paid" : "Not Paid"));

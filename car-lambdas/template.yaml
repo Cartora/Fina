@@ -19,7 +19,7 @@ Resources:
       BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
         - AttributeName: slotId
-          AttributeType: N
+          AttributeType: S
         - AttributeName: timestamp
           AttributeType: S
       KeySchema:
@@ -73,8 +73,8 @@ Resources:
         Variables:
           VALIDATION_BUCKET: payment-validation-bucket
           UNPAID_TABLE: UnpaidCars
-          COOLDOWN_TIME_SECONDS: 3600
-          TOLERANCE_TIME_SECONDS: 600
+          COOLDOWN_TIME_SECONDS: 60
+          TOLERANCE_TIME_SECONDS: 30
       Events:
         CarDataStream:
           Type: DynamoDB
