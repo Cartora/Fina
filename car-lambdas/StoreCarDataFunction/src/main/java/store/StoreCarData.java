@@ -42,7 +42,7 @@ public class StoreCarData implements RequestHandler<Object, String> {
             }
 
             Map<String, AttributeValue> item = new HashMap<>();
-            item.put("slotId", AttributeValue.builder().n(String.valueOf(slotId)).build());
+            item.put("slotId", AttributeValue.builder().s(String.valueOf(slotId)).build());
             item.put("timestamp", AttributeValue.builder().s(timestamp).build());
             item.put("carPlate", AttributeValue.builder().s(plate == null ? "" : plate).build());
 
@@ -53,7 +53,8 @@ public class StoreCarData implements RequestHandler<Object, String> {
                         .build();
 
                 dynamoDb.putItem(request);
-                context.getLogger().log("✅ Saved slot " + slotId + " with plate: " + (plate == null ? "EMPTY" : plate) + "\n");
+                context.getLogger()
+                        .log("✅ Saved slot " + slotId + " with plate: " + (plate == null ? "EMPTY" : plate) + "\n");
             } catch (Exception e) {
                 context.getLogger().log("❌ Error writing slot " + slotId + ": " + e.getMessage() + "\n");
             }
@@ -68,12 +69,10 @@ public class StoreCarData implements RequestHandler<Object, String> {
                     .tableName(tableName)
                     .keyConditionExpression("slotId = :slot")
                     .expressionAttributeValues(Map.of(
-                            ":slot", AttributeValue.builder().n(String.valueOf(slotId)).build()
-                    ))
+                            ":slot", AttributeValue.builder().s(String.valueOf(slotId)).build()))
                     .scanIndexForward(false) // latest first
                     .limit(1)
                     .build();
-
             QueryResponse response = dynamoDb.query(queryRequest);
             if (!response.items().isEmpty()) {
                 String plate = response.items().get(0).get("carPlate").s();
@@ -86,23 +85,31 @@ public class StoreCarData implements RequestHandler<Object, String> {
     }
 
     private boolean shouldParkNewCar(int hour) {
-        if (hour < 6) return random.nextDouble() < 0.1;
-        if (hour < 9) return random.nextDouble() < 0.4;
-        if (hour < 18) return random.nextDouble() < 0.7;
-        if (hour < 22) return random.nextDouble() < 0.5;
+        if (hour < 6)
+            return random.nextDouble() < 0.1;
+        if (hour < 9)
+            return random.nextDouble() < 0.4;
+        if (hour < 18)
+            return random.nextDouble() < 0.7;
+        if (hour < 22)
+            return random.nextDouble() < 0.5;
         return random.nextDouble() < 0.2;
     }
 
     private boolean shouldLeaveCar(int hour) {
-        if (hour < 6) return random.nextDouble() < 0.05;
-        if (hour < 9) return random.nextDouble() < 0.03;
-        if (hour < 18) return random.nextDouble() < 0.01;
-        if (hour < 22) return random.nextDouble() < 0.03;
+        if (hour < 6)
+            return random.nextDouble() < 0.05;
+        if (hour < 9)
+            return random.nextDouble() < 0.03;
+        if (hour < 18)
+            return random.nextDouble() < 0.01;
+        if (hour < 22)
+            return random.nextDouble() < 0.03;
         return random.nextDouble() < 0.05;
     }
 
     private String generateCarPlate() {
-        return String.format("%02d-%03d-%02d",
+        return String.format("%02d%03d%02d",
                 random.nextInt(100),
                 random.nextInt(1000),
                 random.nextInt(100));

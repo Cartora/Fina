@@ -19,7 +19,7 @@ Resources:
       BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
         - AttributeName: slotId
-          AttributeType: N
+          AttributeType: S
         - AttributeName: timestamp
           AttributeType: S
       KeySchema:
@@ -29,6 +29,23 @@ Resources:
           KeyType: RANGE
       StreamSpecification:
         StreamViewType: NEW_IMAGE
+
+  UnpaidCarsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: UnpaidCars
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: carPlate
+          AttributeType: S
+      KeySchema:
+        - AttributeName: carPlate
+          KeyType: HASH
+
+  PaymentValidationBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: payment-validation-bucket
 
   StoreCarDataFunction:
     Type: AWS::Serverless::Function
@@ -46,3 +63,28 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: CarData
+
+  PaymentCheckingFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: PaymentCheckingFunction/
+      Handler: payment.PaymentCheckerLambda::handleRequest
+      Environment:
+        Variables:
+          VALIDATION_BUCKET: payment-validation-bucket
+          UNPAID_TABLE: UnpaidCars
+          COOLDOWN_TIME_SECONDS: 60
+          TOLERANCE_TIME_SECONDS: 30
+      Events:
+        CarDataStream:
+          Type: DynamoDB
+          Properties:
+            Stream: !GetAtt CarDataTable.StreamArn
+            StartingPosition: LATEST
+      Policies:
+        - S3CrudPolicy:
+            BucketName: payment-validation-bucket
+        - DynamoDBReadPolicy:
+            TableName: CarData
+        - DynamoDBCrudPolicy:
+            TableName: UnpaidCars
