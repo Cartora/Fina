@@ -105,7 +105,6 @@ public class PaymentCheckerLambda implements RequestHandler<DynamodbEvent, Void>
     }
 
     private String generateCarOwnerEmail(String carPlate) {
-        String cleanCarPlate = carPlate.replaceAll("-", "");
-        return "carowner" + cleanCarPlate + "@fina.com";
+        return "carowner" + carPlate + "@fina.com";
     }
 }

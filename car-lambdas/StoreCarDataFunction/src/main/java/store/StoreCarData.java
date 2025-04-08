@@ -109,7 +109,7 @@ public class StoreCarData implements RequestHandler<Object, String> {
     }
 
     private String generateCarPlate() {
-        return String.format("%02d-%03d-%02d",
+        return String.format("%02d%03d%02d",
                 random.nextInt(100),
                 random.nextInt(1000),
                 random.nextInt(100));
