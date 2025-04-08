@@ -64,6 +64,43 @@ Resources:
           KeyType: HASH
         - AttributeName: carPlate
           KeyType: RANGE
+      StreamSpecification:
+        StreamViewType: NEW_IMAGE
+  
+  FinesTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Fines
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: carPlate
+          AttributeType: S
+        - AttributeName: validationTimestamp
+          AttributeType: S
+      KeySchema:
+        - AttributeName: carPlate
+          KeyType: HASH
+        - AttributeName: validationTimestamp
+          KeyType: RANGE
+
+  FinePreparationFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: FinePreparationFunction/
+      Handler: fineprep.FinePreparationLambda::handleRequest
+      Environment:
+        Variables:
+          PRICE: "20"
+          FINES_TABLE: Fines
+      Events:
+        FineCandidatesStream:
+          Type: DynamoDB
+          Properties:
+            Stream: !GetAtt FineCandidatesTable.StreamArn
+            StartingPosition: LATEST
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: Fines
 
   StoreCarDataFunction:
     Type: AWS::Serverless::Function
