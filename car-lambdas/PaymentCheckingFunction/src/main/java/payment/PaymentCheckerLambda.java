@@ -56,12 +56,11 @@ public class PaymentCheckerLambda implements RequestHandler<DynamodbEvent, Void>
                             s3Client.getObject(BUCKET_NAME, carPlate).getObjectContent()));
                     Instant nextValidationTime = Instant.parse(reader.readLine());
                     context.getLogger().log("Next validation time for " + carPlate + ": " + nextValidationTime);
-                    
+
                     if (nextValidationTime.isBefore(now)) {
                         // Pango API
                         boolean isPaid = random.nextInt(100) < 85;
-                        String email = generateCarOwnerEmail(carPlate);
-                        
+
                         context.getLogger().log("Car " + carPlate + " validated: " + (isPaid ? "Paid" : "Not Paid"));
 
                         if (!isPaid) {
@@ -70,7 +69,6 @@ public class PaymentCheckerLambda implements RequestHandler<DynamodbEvent, Void>
                             item.put("carPlate", new AttributeValue(carPlate));
                             item.put("slotId", new AttributeValue(slotId));
                             item.put("timestamp", new AttributeValue(timestampStr));
-                            item.put("email", new AttributeValue(email));
 
                             PutItemRequest request = new PutItemRequest()
                                     .withTableName(UNPAID_DYNAMODB_TABLE)
@@ -102,9 +100,5 @@ public class PaymentCheckerLambda implements RequestHandler<DynamodbEvent, Void>
         }
 
         return null;
-    }
-
-    private String generateCarOwnerEmail(String carPlate) {
-        return "carowner" + carPlate + "@fina.com";
     }
 }
