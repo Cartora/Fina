@@ -82,6 +82,8 @@ Resources:
           KeyType: HASH
         - AttributeName: validationTimestamp
           KeyType: RANGE
+      StreamSpecification:
+        StreamViewType: NEW_IMAGE
 
   FinePreparationFunction:
     Type: AWS::Serverless::Function
@@ -164,3 +166,20 @@ Resources:
         - DynamoDBReadPolicy:
             TableName: UnpaidCars
 
+  FineEmailSenderFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: FineEmailSenderFunction/
+      Handler: finesender.FineEmailSenderLambda::handleRequest
+      Environment:
+        Variables:
+          SENDER_EMAIL: sauld70@yahoo.com
+      Events:
+        FinesStream:
+          Type: DynamoDB
+          Properties:
+            Stream: !GetAtt FinesTable.StreamArn
+            StartingPosition: LATEST
+      Policies:
+        - SESCrudPolicy:
+            IdentityName: sauld70@yahoo.com
