@@ -183,3 +183,36 @@ Resources:
       Policies:
         - SESCrudPolicy:
             IdentityName: dsenders06@gmail.com
+
+  FineReportStoreFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: FineReportStoreFunction/
+      Handler: report.FineReportStoreLambda::handleRequest
+      Runtime: java17
+      MemorySize: 512
+      Timeout: 20
+      Environment:
+        Variables:
+          DB_URL: jdbc:postgresql://db-instance-fine-reports.ckjieemwqkan.us-east-1.rds.amazonaws.com:5432/postgres
+          DB_USER: postgres
+          DB_PASSWORD: 12345.com
+      Events:
+        FinesStream:
+          Type: DynamoDB
+          Properties:
+            Stream: !GetAtt FinesTable.StreamArn
+            StartingPosition: LATEST
+      VpcConfig:
+        SecurityGroupIds:
+          - sg-0453cd1c886975dd2  # same SG as your RDS
+        SubnetIds:
+          - subnet-0c0e3e10ea775bb05
+          - subnet-05011bf2436e79976
+          - subnet-072a7418f4047074f
+          - subnet-0ce5e1ccdc98b26cd
+          - subnet-06cd5ce60088ca16c
+          - subnet-0e1fbc30584e4cf9b
+      Policies:
+        - AWSLambdaVPCAccessExecutionRole
+

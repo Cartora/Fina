@@ -49,8 +49,7 @@ public class FineEmailSenderLambda implements RequestHandler<DynamodbEvent, Void
             .withSource(SENDER_EMAIL)
             .withReplyToAddresses(SENDER_EMAIL) // ✅ Reply-To
             .withDestination(new Destination()
-                .withToAddresses(to)
-                .withCcAddresses("tomerp-1000@hotmail.com", "sauld70@yahoo.com"))      // ✅ CC
+                .withToAddresses(to))
             .withMessage(new Message()
                 .withSubject(new Content().withCharset("UTF-8").withData(subject))
                 .withBody(new Body().withText(new Content().withCharset("UTF-8").withData(body))));
