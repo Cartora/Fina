@@ -33,7 +33,6 @@ public class FineEmailSenderLambda implements RequestHandler<DynamodbEvent, Void
             try {
                 SendEmailResult result = sendEmail(recipientEmail, subject, body);
                 context.getLogger().log("✅ Email sent.");
-                context.getLogger().log("To: " + recipientEmail + ", CC: " + CC_EMAIL);
                 context.getLogger().log("Subject: " + subject);
                 context.getLogger().log("SES Message ID: " + result.getMessageId());
                 context.getLogger().log("Full SES Response: " + result.toString());
