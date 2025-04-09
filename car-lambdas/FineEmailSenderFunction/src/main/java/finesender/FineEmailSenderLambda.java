@@ -19,8 +19,7 @@ public class FineEmailSenderLambda implements RequestHandler<DynamodbEvent, Void
             var newImage = record.getDynamodb().getNewImage();
             if (newImage == null) continue;
 
-            // String recipientEmail = newImage.containsKey("email") ? newImage.get("email").getS() : "";
-            String recipientEmail = "sauld70@yahoo.com";
+            String recipientEmail = SENDER_EMAIL;
             String carPlate = newImage.containsKey("carPlate") ? newImage.get("carPlate").getS() : "";
             String validationTimestamp = newImage.containsKey("validationTimestamp") ? newImage.get("validationTimestamp").getS() : "";            
             String price = newImage.containsKey("price") ? newImage.get("price").getS() : "";      
@@ -32,23 +31,31 @@ public class FineEmailSenderLambda implements RequestHandler<DynamodbEvent, Void
             );
 
             try {
-                sendEmail(recipientEmail, subject, body);
-                context.getLogger().log("Email sent to: " + recipientEmail);
+                SendEmailResult result = sendEmail(recipientEmail, subject, body);
+                context.getLogger().log("✅ Email sent.");
+                context.getLogger().log("To: " + recipientEmail + ", CC: " + CC_EMAIL);
+                context.getLogger().log("Subject: " + subject);
+                context.getLogger().log("SES Message ID: " + result.getMessageId());
+                context.getLogger().log("Full SES Response: " + result.toString());
             } catch (Exception e) {
-                context.getLogger().log("Failed to send email to: " + recipientEmail + "\nError: " + e.getMessage());
+                context.getLogger().log("❌ Failed to send email to: " + recipientEmail);
+                context.getLogger().log("Error: " + e.getMessage());
             }
         }
         return null;
     }
 
-    private void sendEmail(String to, String subject, String body) {
+    private SendEmailResult sendEmail(String to, String subject, String body) {
         SendEmailRequest request = new SendEmailRequest()
             .withSource(SENDER_EMAIL)
-            .withDestination(new Destination().withToAddresses(to))
+            .withReplyToAddresses(SENDER_EMAIL) // ✅ Reply-To
+            .withDestination(new Destination()
+                .withToAddresses(to)
+                .withCcAddresses("tomerp-1000@hotmail.com", "sauld70@yahoo.com"))      // ✅ CC
             .withMessage(new Message()
                 .withSubject(new Content().withCharset("UTF-8").withData(subject))
                 .withBody(new Body().withText(new Content().withCharset("UTF-8").withData(body))));
 
-        sesClient.sendEmail(request);
+        return sesClient.sendEmail(request);
     }
 }

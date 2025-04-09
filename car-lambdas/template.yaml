@@ -173,7 +173,7 @@ Resources:
       Handler: finesender.FineEmailSenderLambda::handleRequest
       Environment:
         Variables:
-          SENDER_EMAIL: sauld70@yahoo.com
+          SENDER_EMAIL: dsenders06@gmail.com
       Events:
         FinesStream:
           Type: DynamoDB
@@ -182,4 +182,4 @@ Resources:
             StartingPosition: LATEST
       Policies:
         - SESCrudPolicy:
-            IdentityName: sauld70@yahoo.com
+            IdentityName: dsenders06@gmail.com
