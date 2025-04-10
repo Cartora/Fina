@@ -46,8 +46,7 @@ Resources:
 
   PaymentValidationBucket:
     Type: AWS::S3::Bucket
-    Properties:
-      BucketName: payment-validation-bucket
+    DeletionPolicy: Retain
 
   FineCandidatesTable:
     Type: AWS::DynamoDB::Table
@@ -128,7 +127,7 @@ Resources:
       Handler: payment.PaymentCheckerLambda::handleRequest
       Environment:
         Variables:
-          VALIDATION_BUCKET: payment-validation-bucket
+          VALIDATION_BUCKET: !Ref PaymentValidationBucket
           UNPAID_TABLE: UnpaidCars
           COOLDOWN_TIME_SECONDS: 60
           TOLERANCE_TIME_SECONDS: 30
@@ -140,7 +139,7 @@ Resources:
             StartingPosition: LATEST
       Policies:
         - S3CrudPolicy:
-            BucketName: payment-validation-bucket
+            BucketName: !Ref PaymentValidationBucket
         - DynamoDBReadPolicy:
             TableName: CarData
         - DynamoDBCrudPolicy:
